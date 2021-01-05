@@ -1,0 +1,25 @@
+.Summary{
+    display: flex;
+    /*flex-direction: column;*/
+}
+
+.Summary h1{
+    display: none;
+}
+
+.Calories{
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    margin-left: 30px;
+}
+
+.Calories p {
+    margin: 0;
+    padding: 0;
+}
+
+.Calories p span{
+    padding-left: 10px;
+}

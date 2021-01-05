@@ -1,0 +1,13 @@
+.MainNavigation{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    min-height: 40px;
+    background-color: #aaaaaa;
+    margin:0;
+}
+
+.MainNavigation a{
+    text-decoration: none;
+    color: black;
+}
