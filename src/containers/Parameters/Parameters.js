@@ -56,83 +56,36 @@ class Layout extends Component{
         this.setState({ingredients: updatedIngredients})
     }
 
-    // addMealHandler = (ing1, ing1Value, ing2, ing2Value, ing3, ing3Value) => {
-    //
-    //     const oldCount1 = this.state.ingredients[ing1].amount
-    //     const oldCount2 = this.state.ingredients[ing2].amount
-    //     const oldCount3 = this.state.ingredients[ing3].amount
-    //
-    //     const updatedCount1 = oldCount1 + ing1Value
-    //     const updatedCount2 = oldCount2 + ing2Value
-    //     const updatedCount3 = oldCount3 + ing3Value
-    //
-    //     const updatedIngredients = {
-    //         ...this.state.ingredients
-    //     }
-    //
-    //     if(updatedCount1){
-    //         updatedIngredients[ing1].amount = updatedCount1
-    //     }
-    //     if(updatedCount2){
-    //         updatedIngredients[ing2].amount = updatedCount2
-    //     }
-    //     if(updatedCount3){
-    //         updatedIngredients[ing3].amount = updatedCount3
-    //     }
-    //
-    //     this.setState({ingredients: updatedIngredients})
-    // };
-
     addMealHandler () {
-
+        //Make an array of unknown number of function arguments
         const args = Array.prototype.slice.call(arguments);
 
-        //TODO - podzielić tablice args na dwie: tablice produktów i wartości i dopiero wtedy iterować po nich
+        //initialize arrays of ingredients, their values and their current values
+        const ingredients = []
+        const values = []
+        const oldCounts = []
 
+        //make copy from current state
+        const updatedIngredients = {
+            ...this.state.ingredients
+        }
+
+        //divide function arguments into ingredients and their values, make array of current values
         args.forEach((arg, index) => {
-
-            let oldCount
-            let value
-
             if (index % 2 === 0){
-                // console.log(arg)
-                oldCount = this.state.ingredients[arg].amount
-                console.log("oldCount: "+oldCount)
+                ingredients.push(arg)
+                oldCounts.push(this.state.ingredients[arg].amount)
+            }else {
+                values.push(arg)
             }
-            else{
-                value = arg
-                const updatedCount = oldCount + value
-                console.log(updatedCount)
-            }
-
-
-            // const oldCount = this.state.ingredients[arg].amount
-            // const oldCount = this.state.ingredients.eggs.amount
         })
 
-        // const oldCount1 = this.state.ingredients[ing1].amount
-        // const oldCount2 = this.state.ingredients[ing2].amount
-        // const oldCount3 = this.state.ingredients[ing3].amount
-        //
-        // const updatedCount1 = oldCount1 + ing1Value
-        // const updatedCount2 = oldCount2 + ing2Value
-        // const updatedCount3 = oldCount3 + ing3Value
-        //
-        // const updatedIngredients = {
-        //     ...this.state.ingredients
-        // }
-        //
-        // if(updatedCount1){
-        //     updatedIngredients[ing1].amount = updatedCount1
-        // }
-        // if(updatedCount2){
-        //     updatedIngredients[ing2].amount = updatedCount2
-        // }
-        // if(updatedCount3){
-        //     updatedIngredients[ing3].amount = updatedCount3
-        // }
-        //
-        // this.setState({ingredients: updatedIngredients})
+        ingredients.forEach((ing, index) => {
+            updatedIngredients[ing].amount = oldCounts[index] + values[index]
+        })
+
+        this.setState({ingredients: updatedIngredients})
+
     };
 
     addWholeDayMealsHandler () {
