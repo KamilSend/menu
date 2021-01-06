@@ -21,49 +21,17 @@ class Layout extends Component{
         // },
         ingredients: {
             feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
-        },
+            },
         meals:{
             breakfasts: {
-                // meal1:
-                //     {
-                //         ing1: "eggs",
-                //         ing1Value: 3,
-                //         ing2: "bread",
-                //         ing2Value: 2,
-                //         ing3: "butter",
-                //         ing3Value: 1,
-                //         name: "jajecznica",
-                //     },
-                // meal2:
-                //     {
-                //         ing1: "eggs",
-                //         ing1Value: 2,
-                //         ing2: "bread",
-                //         ing2Value: 3,
-                //         ing3: "butter",
-                //         ing3Value: 1,
-                //         name: "kanapki z jajkiem"
-                //     },
-                // meal3:
-                //     {
-                //         ing1: "feta",
-                //         ing1Value: 1,
-                //         ing2: "mozzarella",
-                //         ing2Value: 1,
-                //         name:"feta z mozzarellą"
-                //     },
-                // meal4:
-                //     {
-                //         ing1: "feta",
-                //         ing1Value: 1,
-                //         ing2: "mozzarella",
-                //         ing2Value: 1,
-                //         ing3: "bread",
-                //         ing3Value: 1,
-                //         ing4: "butter",
-                //         ing4Value: 1,
-                //         name:"feta z mozzarellą z chlebem i masłem"
-                //     },
+            },
+        },
+        menus:{
+            menu1: {
+                breakfast: "meal1",
+                branch: null,
+                dinner: "meal1",
+                supper: "meal1",
             }
         }
     }
@@ -185,6 +153,7 @@ class Layout extends Component{
                     <Route path="/jadlospisy">
                         <WholeDayMeals
                             ingredientsList = {this.state.ingredients}
+                            menus = {this.state.menus}
                             addWholeDayMeals = {this.addWholeDayMealsHandler.bind(this)}
                         />
                     </Route>
