@@ -11,7 +11,10 @@ const recipes = (props) => {
     return (
         <>
             <h1>Przepisy</h1>
-            <Meals addMeal={props.addMeal}/>
+            <Meals
+                addMeal={props.addMeal}
+                meals={props.meals}
+            />
             <Shoplist
                 allIngredients={allIngredients}
             />

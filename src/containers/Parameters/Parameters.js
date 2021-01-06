@@ -25,7 +25,7 @@ class Layout extends Component{
                         ing1: "eggs",
                         ing1Value: 3,
                         ing2: "bread",
-                        ing2Value: 1,
+                        ing2Value: 2,
                         ing3: "butter",
                         ing3Value: 1,
                         name: "jajecznica",
@@ -39,6 +39,26 @@ class Layout extends Component{
                         ing3: "butter",
                         ing3Value: 1,
                         name: "kanapki z jajkiem"
+                    },
+                meal3:
+                    {
+                        ing1: "feta",
+                        ing1Value: 1,
+                        ing2: "mozzarella",
+                        ing2Value: 1,
+                        name:"feta z mozzarellą"
+                    },
+                meal4:
+                    {
+                        ing1: "feta",
+                        ing1Value: 1,
+                        ing2: "mozzarella",
+                        ing2Value: 1,
+                        ing3: "bread",
+                        ing3Value: 1,
+                        ing4: "butter",
+                        ing4Value: 1,
+                        name:"feta z mozzarellą z chlebem i masłem"
                     },
             }
         }
@@ -124,6 +144,7 @@ class Layout extends Component{
                         <Recipes
                             addMeal = {this.addMealHandler.bind(this)}
                             ingredientsList = {this.state.ingredients}
+                            meals={this.state.meals}
                         />
                     </Route>
                     <Route path="/podsumowanie">
