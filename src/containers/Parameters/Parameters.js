@@ -8,7 +8,6 @@ import WholeDayMeals from "../WholeDayMealsTemp/WholeDayMeals";
 
 class Layout extends Component{
 
-
     state = {
         ingredients: {
             feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7},
@@ -57,8 +56,11 @@ class Layout extends Component{
     }
 
     addMealHandler () {
+
         //Make an array of unknown number of function arguments
         const args = Array.prototype.slice.call(arguments);
+
+        console.log('args: '+args)
 
         //initialize arrays of ingredients, their values and their current values
         const ingredients = []
@@ -72,10 +74,10 @@ class Layout extends Component{
 
         //divide function arguments into ingredients and their values, make array of current values
         args.forEach((arg, index) => {
-            if (index % 2 === 0){
+            if (index % 2 === 0 && arg !== null && arg !== undefined){
                 ingredients.push(arg)
                 oldCounts.push(this.state.ingredients[arg].amount)
-            }else {
+            }else if(arg !== null && arg !== undefined){
                 values.push(arg)
             }
         })
