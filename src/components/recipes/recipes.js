@@ -14,6 +14,7 @@ const recipes = (props) => {
             <Meals
                 addMeal={props.addMeal}
                 meals={props.meals}
+                firebase={props.firebase}
             />
             <Shoplist
                 allIngredients={allIngredients}

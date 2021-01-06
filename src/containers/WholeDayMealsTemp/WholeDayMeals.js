@@ -26,7 +26,7 @@ class WholeDayMeals extends Component {
             <>
                 <div>Wybierz jadłospis dla siebie</div>
                 <span onClick={() => {
-                    this.props.addWholeDayMeals('meal1', 'meal2', 'meal1', 'meal2')
+                    this.props.addWholeDayMeals('meal1')
                 }}>Dodaj próbny jadłospis</span>
                 <Shoplist
                     allIngredients={allIngredients}
