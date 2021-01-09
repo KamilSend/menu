@@ -3,7 +3,7 @@ import React from 'react';
 import DisplayProducts from './displayProducts/displayProducts'
 import Shoplist from "../../containers/Shoplist/Shoplist";
 
-import styles from './products.module.css'
+import styles from './products.module.scss'
 
 const products =(props) => {
 

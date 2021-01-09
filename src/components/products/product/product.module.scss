@@ -1,9 +1,4 @@
-.Meals{
-    display: flex;
-    flex-direction: column;
-}
-
-.Meal{
+.Product {
     display: flex;
     justify-content: flex-start;
     align-items: center;
@@ -17,8 +12,9 @@
     cursor: pointer;
     background-color: #fbfbfb;
     border-radius: 5px;
-}
 
-.Meal:hover{
-    background-color: #eeeeee;
+    &:hover{
+        background-color: #eeeeee;
+
+    }
 }
