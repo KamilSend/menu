@@ -10,15 +10,6 @@ import WholeDayMeals from "../WholeDayMealsTemp/WholeDayMeals";
 class Layout extends Component{
 
     state = {
-        // ingredients: {
-        //     feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7},
-        //     eggs: {id:2, name: "jajka", amount: null, kcal: 2, price: 6},
-        //     butter: {id:3, name: "masło", amount : null, kcal: 3, price: 5},
-        //     milk_skim: {id:4, name: "mleko 1,5%", amount: null, kcal: 4, price: 4},
-        //     milk_regular: {id:5, name: "mleko 3,2%", amount: null, kcal: 5, price: 3},
-        //     mozzarella: {id:6, name: "mozarella", amount : null, kcal: 6, price: 2},
-        //     bread: {id:7, name: "chleb", amount: null, kcal: 7, price: 1}
-        // },
         ingredients: {
             feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
             },
@@ -102,16 +93,9 @@ class Layout extends Component{
 
     }
 
-    firebase = () => {
-        // //wysyłanie stanu do firebase
-        // const ingredients = this.state.ingredients
-        //
-        // axios.post('/ingredients.json', ingredients)
-        //     .then(response => console.log(response))
-        //     .catch(error => console.log(error))
-    }
-
     componentDidMount() {
+
+        //póki co prymitywne pobieranie całej bazy danych z firebase
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredients.json')
             .then(response => {
                 this.setState({ingredients: response.data})
@@ -140,7 +124,6 @@ class Layout extends Component{
                     <Route path="/przepisy">
                         <Recipes
                             addMeal = {this.addMealHandler.bind(this)}
-                            firebase = {this.firebase}
                             ingredientsList = {this.state.ingredients}
                             meals={this.state.meals}
                         />

@@ -30,7 +30,6 @@ class Meals extends Component{
                 <div className={styles.Meals}>
                     {meals}
                 </div>
-                <button onClick={this.props.firebase}>Send data to firebase</button>
             </>
         )
     }
