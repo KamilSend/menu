@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import styles from './meals.module.css'
+import styles from './meals.module.scss'
 
 class Meals extends Component{
 

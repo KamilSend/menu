@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 
-import styles from './Shoplist.module.css'
+import styles from './Shoplist.module.scss'
 
 class Shoplist extends Component{
 

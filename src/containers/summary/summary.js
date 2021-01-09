@@ -2,7 +2,7 @@ import React from 'react'
 
 import Shoplist from "../Shoplist/Shoplist";
 
-import styles from "./summary.module.css"
+import styles from "./summary.module.scss"
 
 const summary = (props) => {
 

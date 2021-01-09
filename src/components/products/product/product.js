@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from './product.module.css'
+import styles from './product.module.scss'
 
 const product =(props) => (
     <span
