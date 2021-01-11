@@ -16,10 +16,10 @@ class Layout extends Component{
         addIngredient: {
             title: '',
             name: '',
-            kcal: '',
+            kcal: 0,
             id: 0,
-            price: '',
-            amount: 0,
+            price: 0,
+            amount: null,
         },
         meals:{
             breakfasts: {
@@ -125,11 +125,32 @@ class Layout extends Component{
         this.setState({addIngredient: {
                 title: '',
                 name: '',
-                kcal: '',
+                kcal: 0,
                 id: 0,
                 price: '',
                 amount: 0,
             },})
+
+        const updatedIngredients = Object.entries({
+            ...this.state.ingredients
+        })
+
+        const id = Object.keys(this.state.ingredients).length + 1
+
+        const newID = id - 2
+
+        updatedIngredients[newID][0] = this.state.addIngredient.title
+        updatedIngredients[newID][1] = {
+            amount: this.state.addIngredient.amount,
+            id: id,
+            kcal: this.state.addIngredient.kcal,
+            name: this.state.addIngredient.name,
+            price: this.state.addIngredient.price
+        }
+
+        const newStateObject = Object.fromEntries(updatedIngredients)
+
+        this.setState({ingredients: newStateObject})
     }
 
     // ----------------------SENDING PRODUCTS TO FIREBASE END------------------------------------------
@@ -148,15 +169,6 @@ class Layout extends Component{
                 }
             )
     }
-
-    componentDidUpdate(prevProps, prevState, snapshot) {
-        axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredients.json')
-            .then(response => {
-                    this.setState({ingredients: response.data})
-                }
-            )
-    }
-
 
     render(){
 

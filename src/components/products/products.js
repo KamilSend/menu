@@ -11,6 +11,9 @@ const products =(props) => {
     const allIngredients = Object.keys(props.ingredientsList)
         .map((key) => [(key), props.ingredientsList[key]]);
 
+    // console.log(props.ingredientsList)
+    // console.log(allIngredients)
+
     return(
         <>
         <div className={styles.Products}>
@@ -18,10 +21,9 @@ const products =(props) => {
                 <h3>Nabiał</h3>
                 <DisplayProducts
                     allIngredients = {allIngredients}
-                    // from = '0'
-                    // to = '11'
                     addIngredient = {props.addIngredient}
                 />
+
             </div>
             <div>
                 <AddProduct
