@@ -13,6 +13,14 @@ class Layout extends Component{
         ingredients: {
             feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
             },
+        addIngredient: {
+            title: null,
+            name: null,
+            kcal: null,
+            id: 0,
+            price: null,
+            amount: 0,
+        },
         meals:{
             breakfasts: {
             },
@@ -93,12 +101,51 @@ class Layout extends Component{
 
     }
 
+    // ----------------------SENDING PRODUCTS TO FIREBASE START------------------------------------------
+    inputIngredientHandler(event, type) {
+
+        console.log(this.state.ingredients)
+
+        const updatedIngredient = {
+            ...this.state.addIngredient
+        }
+        updatedIngredient[type] = event.target.value
+        this.setState({addIngredient: updatedIngredient})
+        console.log(event.target.value)
+        console.log(type)
+        console.log(this.state)
+    }
+
+    handleIngredientSubmit = () => {
+
+        axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/ingredients/${this.state.addIngredient.title}.json`,
+
+            {
+                id: Object.keys(this.state.ingredients).length + 1,
+                name: this.state.addIngredient.name,
+                amount: this.state.addIngredient.amount,
+                kcal: this.state.addIngredient.kcal,
+                price: this.state.addIngredient.price
+            }
+        )
+            .then(response => console.log(response))
+
+        console.log(this.state)
+    }
+
+    // ----------------------SENDING PRODUCTS TO FIREBASE END------------------------------------------
+
     componentDidMount() {
 
         //póki co prymitywne pobieranie całej bazy danych z firebase
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredients.json')
             .then(response => {
                 this.setState({ingredients: response.data})
+                //potrzebne do ustalenia ID, trzeba to przekazać przez propsy
+                //TODO trzeba dodać do stanu obiekt tymczasowego produktu z komponentu addProduct i oprócz wysyłania
+                // do firebase dodawać produkt lokalnie do stanu żeby nie pobierała się cała baza danych za każdym razem
+                // niepotrzebnie
+                console.log(Object.keys(response.data).length)
                 }
             )
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/meals.json')
@@ -119,6 +166,8 @@ class Layout extends Component{
                         <Products
                             addIngredient={this.addIngredientHandler}
                             ingredientsList = {this.state.ingredients}
+                            inputAddProduct = {this.inputIngredientHandler.bind(this)}
+                            submitProduct = {this.handleIngredientSubmit.bind(this)}
                         />
                     </Route>
                     <Route path="/przepisy">
