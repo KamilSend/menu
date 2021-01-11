@@ -27,6 +27,7 @@ const products =(props) => {
                 <AddProduct
                     inputAddProduct = {props.inputAddProduct}
                     submitProduct = {props.submitProduct}
+                    inputValues = {props.inputValues}
                 />
             </div>
         </div>

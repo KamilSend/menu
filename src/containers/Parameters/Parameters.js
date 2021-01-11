@@ -14,11 +14,11 @@ class Layout extends Component{
             feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
             },
         addIngredient: {
-            title: null,
-            name: null,
-            kcal: null,
+            title: '',
+            name: '',
+            kcal: '',
             id: 0,
-            price: null,
+            price: '',
             amount: 0,
         },
         meals:{
@@ -121,6 +121,15 @@ class Layout extends Component{
             }
         )
             .then(response => console.log(response))
+
+        this.setState({addIngredient: {
+                title: '',
+                name: '',
+                kcal: '',
+                id: 0,
+                price: '',
+                amount: 0,
+            },})
     }
 
     // ----------------------SENDING PRODUCTS TO FIREBASE END------------------------------------------
@@ -140,6 +149,14 @@ class Layout extends Component{
             )
     }
 
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredients.json')
+            .then(response => {
+                    this.setState({ingredients: response.data})
+                }
+            )
+    }
+
 
     render(){
 
@@ -153,6 +170,7 @@ class Layout extends Component{
                             ingredientsList = {this.state.ingredients}
                             inputAddProduct = {this.inputIngredientHandler.bind(this)}
                             submitProduct = {this.handleIngredientSubmit.bind(this)}
+                            inputValues={this.state.addIngredient}
                         />
                     </Route>
                     <Route path="/przepisy">

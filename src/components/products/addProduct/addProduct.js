@@ -8,19 +8,27 @@ const addProduct = (props) => (
         <input
             onChange={(event) => props.inputAddProduct(event, 'title')}
             type="text"
-            placeholder="Podaj tytuł produktu"/>
+            placeholder="Podaj tytuł produktu"
+            value={props.inputValues.title}
+        />
         <input
             onChange={(event) => props.inputAddProduct(event, 'name')}
             type="text"
-            placeholder="Podaj dokładną nazwę produktu"/>
+            placeholder="Podaj dokładną nazwę produktu"
+            value={props.inputValues.name}
+        />
         <input
             onChange={(event) => props.inputAddProduct(event, 'kcal')}
             type="text"
-            placeholder="Podaj kaloryczność"/>
+            placeholder="Podaj kaloryczność"
+            value={props.inputValues.kcal}
+        />
         <input
             onChange={(event) => props.inputAddProduct(event, 'price')}
             type="text"
-            placeholder="Podaj cenę"/>
+            placeholder="Podaj cenę"
+            value={props.inputValues.price}
+        />
         <button
             onClick={props.submitProduct}
             type="submit"
