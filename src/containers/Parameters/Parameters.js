@@ -13,6 +13,9 @@ class Layout extends Component{
         ingredients: {
             feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
             },
+        ingredientsID:{
+            id: 0,
+        },
         addIngredient: {
             title: '',
             name: '',
@@ -111,9 +114,32 @@ class Layout extends Component{
     }
 
     handleIngredientSubmit = () => {
+
+        //form validation
+        if(this.state.addIngredient.title === ''){
+            alert('podaj tytuł produktu')
+            return
+        }
+
+        if(this.state.addIngredient.name === ''){
+            alert('podaj nazwę produktu')
+            return
+        }
+
+        if(this.state.addIngredient.kcal === 0 || this.state.addIngredient.kcal === ''){
+            alert('podaj kaloryczność produktu')
+            return
+        }
+
+        if(this.state.addIngredient.price === 0 || this.state.addIngredient.price === ''){
+            alert('podaj cenę produktu')
+            return
+        }
+
+        //use axios to send ingredient object
         axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/ingredients/${this.state.addIngredient.title}.json`,
             {
-                id: Object.keys(this.state.ingredients).length + 1,
+                id: this.state.ingredientsID.id + 1,
                 name: this.state.addIngredient.name,
                 amount: this.state.addIngredient.amount,
                 kcal: this.state.addIngredient.kcal,
@@ -122,35 +148,46 @@ class Layout extends Component{
         )
             .then(response => console.log(response))
 
+        //use axios to send current id, each new ingredient will receive unique id
+        axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/ingredientsID.json`,
+            {
+                id: this.state.ingredientsID.id + 1
+            }
+        )
+            .then(response => console.log(response))
+
+        //clear state (clear inputs) after sending ingredient
         this.setState({addIngredient: {
                 title: '',
                 name: '',
                 kcal: 0,
                 id: 0,
-                price: '',
+                price: 0,
                 amount: 0,
             },})
 
+        //make object from array which is copy of the state
         const updatedIngredients = Object.entries({
             ...this.state.ingredients
         })
 
-        const id = Object.keys(this.state.ingredients).length + 1
-
-        const newID = id - 2
-
-        updatedIngredients[newID][0] = this.state.addIngredient.title
-        updatedIngredients[newID][1] = {
+        //make an array from new ingredient object
+        const newIngredient = [this.state.addIngredient.title, {
             amount: this.state.addIngredient.amount,
-            id: id,
+            id: this.state.ingredientsID.id + 1,
             kcal: this.state.addIngredient.kcal,
             name: this.state.addIngredient.name,
-            price: this.state.addIngredient.price
-        }
+            price: this.state.addIngredient.price}]
 
+        //add new ingredient to ingredients array
+        updatedIngredients.push(newIngredient)
+
+        //make object from ingredients array
         const newStateObject = Object.fromEntries(updatedIngredients)
 
+        //set new state for ingredients and id
         this.setState({ingredients: newStateObject})
+        this.setState({ingredientsID: {id: this.state.ingredientsID.id + 1}})
     }
 
     // ----------------------SENDING PRODUCTS TO FIREBASE END------------------------------------------
@@ -163,6 +200,12 @@ class Layout extends Component{
                 this.setState({ingredients: response.data})
                 }
             )
+        axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredientsID.json')
+            .then(response => {
+                    this.setState({ingredientsID: response.data})
+                }
+            )
+
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/meals.json')
             .then(response => {
                     this.setState({meals: response.data})

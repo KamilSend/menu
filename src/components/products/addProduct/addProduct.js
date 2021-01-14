@@ -19,13 +19,13 @@ const addProduct = (props) => (
         />
         <input
             onChange={(event) => props.inputAddProduct(event, 'kcal')}
-            type="text"
+            type="number"
             placeholder="Podaj kaloryczność"
             value={props.inputValues.kcal}
         />
         <input
             onChange={(event) => props.inputAddProduct(event, 'price')}
-            type="text"
+            type="number"
             placeholder="Podaj cenę"
             value={props.inputValues.price}
         />
