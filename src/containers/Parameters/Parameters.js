@@ -28,6 +28,13 @@ class Layout extends Component{
         meals:{
             breakfasts: {
             },
+            //zmienić całą strukture, żeby było  po prostu jajko: 2, chleb: 2,
+        },
+        meals2: {
+            breakfasts: {
+                scrambledEggs: {id:1, title:"scrambledEggs", name: "jajecznica", ingredients: {eggs: 3, butter: 1, bread: 1}},
+                hamTomatoesSandwich: {id:1, title:"hamTomatoesSandwich", name: "kanapka z szynką i pomidorem", ingredients: {ham: 1, tomatoes:1, butter: 1, bread: 1}},
+            }
         },
         addMeal: {
             // counter: [1],
@@ -68,6 +75,30 @@ class Layout extends Component{
             updatedIngredients2[type].amount = oldCount + 1;
 
             this.setState({ingredientsAddedToMeal: updatedIngredients2})
+
+            // console.log(this.state.ingredientsAddedToMeal)
+
+            const allIngredients = Object.keys(updatedIngredients2)
+                .map((key) => [(key), updatedIngredients2[key]]);
+
+            // console.log(allIngredients)
+
+            const table = []
+
+            allIngredients.map((ingredient) => {
+                if (ingredient[1].amount) {
+                    const ing = [ingredient[0], ingredient[1].amount]
+                    table.push(ing)
+                    console.log(table[0][0])
+                    // console.log(ingredient[0])
+                    // console.log(ingredient[1].amount)
+                } else return null;
+            })
+
+            //trzeba powyżej zrobić jakąś tablice i zamiast logi to pushować te wartości, potem zrobić testowy
+            // obiekt z jakąś nazwą na sztywno póki co, potem trzeba odejść od tego meal1, meal2 itd i pisać
+            // jakieś normalne nazwy
+
             return
         }
 
@@ -85,7 +116,7 @@ class Layout extends Component{
     addMealHandler () {
 
         //Make an array of unknown number of function arguments
-        const args = Array.prototype.slice.call(arguments);
+        const args = Array.prototype.slice.call(arguments)[0];
 
         console.log('args: '+args)
 
@@ -117,21 +148,60 @@ class Layout extends Component{
 
     };
 
+    // addMealHandler2 () {
+    //
+    //     console.log(arguments[0])
+    //
+    //     //Make an array of unknown number of function arguments
+    //     const args = Array.prototype.slice.call(arguments)[0];
+    //
+    //     console.log(args)
+    //
+    //     //initialize arrays of ingredients, their values and their current values
+    //     const ingredients = []
+    //     const values = []
+    //     const oldCounts = []
+    //
+    //     //make copy from current state
+    //     const updatedIngredients = {
+    //         ...this.state.ingredients
+    //     }
+    //
+    //     //divide function arguments into ingredients and their values, make array of current values
+    //     args.forEach((arg, index) => {
+    //         if (index % 2 === 0 && arg !== null && arg !== undefined){
+    //             ingredients.push(arg)
+    //             oldCounts.push(this.state.ingredients[arg].amount)
+    //         }else if(arg !== null && arg !== undefined){
+    //             values.push(arg)
+    //         }
+    //     })
+    //
+    //     ingredients.forEach((ing, index) => {
+    //         updatedIngredients[ing].amount = oldCounts[index] + values[index]
+    //     })
+    //
+    //     this.setState({ingredients: updatedIngredients})
+    //
+    // };
+
     addWholeDayMealsHandler () {
         //Make an array of unknown number of function arguments, arguments are set in WholeDayMeals
         const args = Array.prototype.slice.call(arguments);
 
+        //TODO - przerobić całe dodawanie jadłospisów, tak jak dodawanie przepisów
+
         //loop through all arguments (meals)
         args.forEach((arg) => {
             this.addMealHandler(
-                this.state.meals.breakfasts[arg].ing1,
-                this.state.meals.breakfasts[arg].ing1Value,
-                this.state.meals.breakfasts[arg].ing2,
-                this.state.meals.breakfasts[arg].ing2Value,
-                this.state.meals.breakfasts[arg].ing3,
-                this.state.meals.breakfasts[arg].ing3Value,
-                this.state.meals.breakfasts[arg].ing4,
-                this.state.meals.breakfasts[arg].ing4Value
+                this.state.meals2.breakfasts[arg].ing1,
+                this.state.meals2.breakfasts[arg].ing1Value,
+                this.state.meals2.breakfasts[arg].ing2,
+                this.state.meals2.breakfasts[arg].ing2Value,
+                // this.state.meals.breakfasts[arg].ing3,
+                // this.state.meals.breakfasts[arg].ing3Value,
+                // this.state.meals.breakfasts[arg].ing4,
+                // this.state.meals.breakfasts[arg].ing4Value
             )
         })
 
@@ -231,7 +301,7 @@ class Layout extends Component{
     }
 
     switchAddingIngredientsModeHandler = () => {
-        this.setState({addMealMode: true})
+        this.setState({addMealMode: !this.state.addMealMode})
         console.log(this.state.addMealMode)
     }
 
@@ -244,9 +314,7 @@ class Layout extends Component{
             .then(response => {
 
                 const ingredients = response.data
-
                 const ingredients2 = JSON.parse(JSON.stringify(ingredients));
-
 
                 // this.setState({ingredients: response.data})
                 this.setState({ingredients: ingredients})
@@ -285,13 +353,16 @@ class Layout extends Component{
                         <RecipesModal
                             ingredientsList = {this.state.ingredientsAddedToMeal}
                             addIngredient={this.addIngredientHandler}
+                            switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
                         />
                     </Route>
                     <Route path="/przepisy">
                         <Recipes
                             addMeal = {this.addMealHandler.bind(this)}
+                            // addMeal2 = {this.addMealHandler2.bind(this)}
                             ingredientsList = {this.state.ingredients}
-                            meals={this.state.meals}
+                            // meals={this.state.meals}
+                            meals2={this.state.meals2}
                             productCounter = {this.state.addMeal.counter}
                             sendCustomRecipe = {this.sendCustomRecipeHandler}
                             switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
