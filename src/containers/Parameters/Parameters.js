@@ -37,15 +37,12 @@ class Layout extends Component{
             }
         },
         addMeal: {
-            // counter: [1],
-            // meal2: {
-            //     ing1: "",
-            //     ing1Value: 0,
-            //     ing2: "",
-            //     ing2Value: 0,
-            //     ing3: "",
-            //     ing3Value: 0,
-            // }
+            breakfasts: {
+                title:'',
+                id: 0,
+                name:'',
+                ingredients: {}
+            }
         },
         ingredientsAddedToMeal: {
             feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
@@ -63,46 +60,60 @@ class Layout extends Component{
 
     addIngredientHandler = (type) => {
         if(this.state.addMealMode === true){
-
+            //to będzie potrzebne chyba przy ostatecznym dodawaniu przepisu do właściwego stanu
             // const currentMeals = Object.keys(this.state.meals.breakfasts)
             //     .map((key) => [(key), this.state.meals.breakfasts[key]]);
 
+            //make copy of current ingredients object (all ingredients available)
             const updatedIngredients2 = JSON.parse(JSON.stringify({
                 ...this.state.ingredientsAddedToMeal
             }));
 
+            //check which ingredients is added, and add plus one to its amount and set a new state
             const oldCount = this.state.ingredientsAddedToMeal[type].amount;
             updatedIngredients2[type].amount = oldCount + 1;
-
             this.setState({ingredientsAddedToMeal: updatedIngredients2})
 
-            // console.log(this.state.ingredientsAddedToMeal)
-
+            //make array from updatedIngredients object
             const allIngredients = Object.keys(updatedIngredients2)
                 .map((key) => [(key), updatedIngredients2[key]]);
 
-            // console.log(allIngredients)
-
+            //initialize empty array, to put in ingredients with non-zero amount
             const table = []
 
+            //filter ingredients to catch only with non-zero amount
             allIngredients.map((ingredient) => {
                 if (ingredient[1].amount) {
                     const ing = [ingredient[0], ingredient[1].amount]
                     table.push(ing)
-                    console.log(table[0][0])
-                    // console.log(ingredient[0])
-                    // console.log(ingredient[1].amount)
+                    const nonZeroIngredients = Object.fromEntries(table)
+
+                    //adding added ingredients to state
+                    this.setState({addMeal: {
+                        breakfasts: {
+                            title:'',
+                                id: 0,
+                                name:'',
+                                ingredients: nonZeroIngredients
+                        }
+                    }})
+
+                    // console.log(this.state.addMeal)
                 } else return null;
             })
 
-            //trzeba powyżej zrobić jakąś tablice i zamiast logi to pushować te wartości, potem zrobić testowy
-            // obiekt z jakąś nazwą na sztywno póki co, potem trzeba odejść od tego meal1, meal2 itd i pisać
-            // jakieś normalne nazwy
+            //w ten sposób stworzyć później tablice z której potem sie zrobi obiekt który można użyć w setState
+            // const newRecipe = [this.state.addIngredient.title, {
+            //     amount: this.state.addIngredient.amount,
+            //     id: this.state.ingredientsID.id + 1,
+            //     kcal: this.state.addIngredient.kcal,
+            //     name: this.state.addIngredient.name,
+            //     price: this.state.addIngredient.price}]
 
             return
         }
 
-
+        //simple adding ingredients to state when you are in default mode
         const oldCount = this.state.ingredients[type].amount;
         const updatedCount = oldCount + 1;
         const updatedIngredients = {
