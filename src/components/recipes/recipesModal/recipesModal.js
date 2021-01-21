@@ -30,13 +30,13 @@ const recipesModal = (props) => {
             <div>
 
                 <input
-                    // onChange={(event) => props.inputAddProduct(event, 'name')}
+                    onChange={(event) => props.addMealInputs(event, 'title')}
                     type="text"
                     placeholder="Podaj tytuł produktu"
                     // value={props.inputValues.name}
                 />
                 <input
-                    // onChange={(event) => props.inputAddProduct(event, 'name')}
+                    onChange={(event) => props.addMealInputs(event, 'name')}
                     type="text"
                     placeholder="Podaj dokładną nazwę produktu"
                     // value={props.inputValues.name}
@@ -44,7 +44,7 @@ const recipesModal = (props) => {
                 <Shoplist
                     allIngredients={allIngredients}
                 />
-                <button type="submit">Wyślij przepis</button>
+                <button onClick={props.sendCustomRecipe} type="submit">Wyślij przepis</button>
 
 
             </div>
