@@ -155,43 +155,6 @@ class Layout extends Component{
 
     };
 
-    // addMealHandler2 () {
-    //
-    //     console.log(arguments[0])
-    //
-    //     //Make an array of unknown number of function arguments
-    //     const args = Array.prototype.slice.call(arguments)[0];
-    //
-    //     console.log(args)
-    //
-    //     //initialize arrays of ingredients, their values and their current values
-    //     const ingredients = []
-    //     const values = []
-    //     const oldCounts = []
-    //
-    //     //make copy from current state
-    //     const updatedIngredients = {
-    //         ...this.state.ingredients
-    //     }
-    //
-    //     //divide function arguments into ingredients and their values, make array of current values
-    //     args.forEach((arg, index) => {
-    //         if (index % 2 === 0 && arg !== null && arg !== undefined){
-    //             ingredients.push(arg)
-    //             oldCounts.push(this.state.ingredients[arg].amount)
-    //         }else if(arg !== null && arg !== undefined){
-    //             values.push(arg)
-    //         }
-    //     })
-    //
-    //     ingredients.forEach((ing, index) => {
-    //         updatedIngredients[ing].amount = oldCounts[index] + values[index]
-    //     })
-    //
-    //     this.setState({ingredients: updatedIngredients})
-    //
-    // };
-
     addWholeDayMealsHandler () {
         //Make an array of unknown number of function arguments, arguments are set in WholeDayMeals
         const args = Array.prototype.slice.call(arguments);
@@ -332,11 +295,16 @@ class Layout extends Component{
                                 }
         })
 
-        console.log(this.state.meals2)
-
-        // console.log(this.state.meals2.breakfasts)
-        console.log(updatedRecipe)
-        // console.log(newRecipe)
+        //use axios to send recipe
+        axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/meals/breakfasts/${this.state.addMeal.breakfasts.title}.json`,
+            {
+                id: this.state.mealsID.id + 1,
+                name: this.state.addMeal.breakfasts.name,
+                title: this.state.addMeal.breakfasts.title,
+                ingredients: this.state.addMeal.breakfasts.ingredients,
+            }
+        )
+            .then(response => console.log(response))
     }
 
     switchAddingIngredientsModeHandler = () => {

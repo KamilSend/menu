@@ -26,8 +26,8 @@ class Meals extends Component{
         // })
 
 
-        console.log(this.props.meals2.breakfasts)
-        console.log(Object.values(this.props.meals2.breakfasts))
+        // console.log(this.props.meals2.breakfasts)
+        // console.log(Object.values(this.props.meals2.breakfasts))
 
         const meals = Object.values(this.props.meals2.breakfasts).map(meal => {
             // console.log(meal.ingredients)
