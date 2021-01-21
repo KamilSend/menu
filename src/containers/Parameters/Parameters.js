@@ -348,6 +348,11 @@ class Layout extends Component{
 
     componentDidMount() {
 
+        //check if add recipe modal is on, and switch mode if neccessary
+        if(window.location.pathname === "/przepisy/dodaj"){
+            this.setState({addMealMode: true})
+        }
+
         //póki co prymitywne pobieranie całej bazy danych z firebase
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredients.json')
             .then(response => {

@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import DisplayProducts from '../../products/displayProducts/displayProducts'
 import Shoplist from "../../../containers/Shoplist/Shoplist";
+import Glass from '../../../components/glass/glass'
 
 import styles from './recipesModal.module.scss'
 
@@ -11,10 +12,9 @@ const recipesModal = (props) => {
     const allIngredients = Object.keys(props.ingredientsList)
         .map((key) => [(key), props.ingredientsList[key]]);
 
-    console.log(props.inputValues)
-
     return(
         // TODO zrobić szkło z jakimś napisem typu 'jesteś w trybie dodawania produktu, wybierz składniki i wyślij'
+        <>
         <div className={styles.RecipesModal}>
             <div>
                 <h1>Dodaj produkty do przepisu</h1>
@@ -50,9 +50,11 @@ const recipesModal = (props) => {
 
 
             </div>
-
         </div>
-    )
+    <Glass/>
+        </>
+
+)
 }
 
 export default recipesModal
