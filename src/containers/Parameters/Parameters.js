@@ -48,7 +48,7 @@ class Layout extends Component{
             }
         },
         ingredientsAddedToMeal: {
-            feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
+            // feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
         },
         addMealMode: false,
         menus:{
@@ -85,7 +85,7 @@ class Layout extends Component{
             const table = []
 
             //filter ingredients to catch only with non-zero amount
-            allIngredients.map((ingredient) => {
+           allIngredients.forEach((ingredient) => {
                 if (ingredient[1].amount) {
                     const ing = [ingredient[0], ingredient[1].amount]
                     table.push(ing)
@@ -305,7 +305,39 @@ class Layout extends Component{
             }
         )
             .then(response => console.log(response))
+
+        //use axios to send current id, each new recipe will receive unique id
+        axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/mealsID.json`,
+            {
+                id: this.state.mealsID.id + 1
+            }
+        )
+            .then(response => console.log(response))
+
+        //clear state (clear inputs) after sending ingredient
+        this.setState({addMeal: {
+                breakfasts: {
+                    title:'',
+                    id: 0,
+                    name:'',
+                    ingredients: {}
+                }
+            },})
+        //clear state (ingredients list)
+
+
+        axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredients.json')
+            .then(response => {
+                    const ingredients = response.data
+                    const ingredients2 = JSON.parse(JSON.stringify(ingredients));
+                    this.setState({ingredientsAddedToMeal: ingredients2})
+                }
+            )
+        // this.setState({ingredientsAddedToMeal: {}})
+
     }
+
+
 
     switchAddingIngredientsModeHandler = () => {
         this.setState({addMealMode: !this.state.addMealMode})
@@ -330,6 +362,12 @@ class Layout extends Component{
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredientsID.json')
             .then(response => {
                     this.setState({ingredientsID: response.data})
+                }
+            )
+
+        axios.get('https://menu-b8774-default-rtdb.firebaseio.com/mealsID.json')
+            .then(response => {
+                    this.setState({mealsID: response.data})
                 }
             )
 
@@ -362,6 +400,7 @@ class Layout extends Component{
                             switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
                             addMealInputs={this.addMealInputsHandler.bind(this)}
                             sendCustomRecipe = {this.sendCustomRecipeHandler}
+                            inputValues={this.state.addMeal}
                         />
                     </Route>
                     <Route path="/przepisy">
@@ -373,7 +412,6 @@ class Layout extends Component{
                             meals2={this.state.meals2}
                             productCounter = {this.state.addMeal.counter}
                             switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
-
                         />
                     </Route>
                     <Route path="/podsumowanie">

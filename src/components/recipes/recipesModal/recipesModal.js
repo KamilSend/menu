@@ -11,6 +11,8 @@ const recipesModal = (props) => {
     const allIngredients = Object.keys(props.ingredientsList)
         .map((key) => [(key), props.ingredientsList[key]]);
 
+    console.log(props.inputValues)
+
     return(
         // TODO zrobić szkło z jakimś napisem typu 'jesteś w trybie dodawania produktu, wybierz składniki i wyślij'
         <div className={styles.RecipesModal}>
@@ -33,13 +35,13 @@ const recipesModal = (props) => {
                     onChange={(event) => props.addMealInputs(event, 'title')}
                     type="text"
                     placeholder="Podaj tytuł produktu"
-                    // value={props.inputValues.name}
+                    value={props.inputValues.breakfasts.title}
                 />
                 <input
                     onChange={(event) => props.addMealInputs(event, 'name')}
                     type="text"
                     placeholder="Podaj dokładną nazwę produktu"
-                    // value={props.inputValues.name}
+                    value={props.inputValues.breakfasts.name}
                 />
                 <Shoplist
                     allIngredients={allIngredients}
