@@ -29,6 +29,7 @@ const addMeal = (props) => {
                 Dodaj składniki
             </NavLink>
 
+
             <button onClick={props.sendCustomRecipe}>Wyślij przepis</button>
 
 

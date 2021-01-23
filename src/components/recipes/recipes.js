@@ -18,7 +18,9 @@ const recipes = (props) => {
                     <h1>Przepisy</h1>
                     <Meals
                         addMeal={props.addMeal}
-                        meals={props.meals}
+                        // addMeal2={props.addMeal2}
+                        // meals={props.meals}
+                        meals2={props.meals2}
                         firebase={props.firebase}
                     />
                     <Shoplist
