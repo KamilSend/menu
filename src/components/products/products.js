@@ -2,6 +2,7 @@ import React from 'react';
 
 import DisplayProducts from './displayProducts/displayProducts'
 import Shoplist from "../../containers/Shoplist/Shoplist";
+import AddProduct from './addProduct/addProduct'
 
 import styles from './products.module.scss'
 
@@ -10,6 +11,9 @@ const products =(props) => {
     const allIngredients = Object.keys(props.ingredientsList)
         .map((key) => [(key), props.ingredientsList[key]]);
 
+    // console.log(props.ingredientsList)
+    // console.log(allIngredients)
+
     return(
         <>
         <div className={styles.Products}>
@@ -17,12 +21,17 @@ const products =(props) => {
                 <h3>Nabiał</h3>
                 <DisplayProducts
                     allIngredients = {allIngredients}
-                    // from = '0'
-                    // to = '11'
                     addIngredient = {props.addIngredient}
                 />
-            </div>
 
+            </div>
+            <div>
+                <AddProduct
+                    inputAddProduct = {props.inputAddProduct}
+                    submitProduct = {props.submitProduct}
+                    inputValues = {props.inputValues}
+                />
+            </div>
         </div>
             <Shoplist
                 allIngredients = {allIngredients}

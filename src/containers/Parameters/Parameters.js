@@ -6,6 +6,7 @@ import Products from '../../components/products/products'
 import Summary from '../summary/summary'
 import Recipes from "../../components/recipes/recipes";
 import WholeDayMeals from "../WholeDayMealsTemp/WholeDayMeals";
+import RecipesModal from "../../components/recipes/recipesModal/recipesModal"
 
 class Layout extends Component{
 
@@ -13,10 +14,36 @@ class Layout extends Component{
         ingredients: {
             feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
             },
+        ingredientsID:{
+            id: 0,
+        },
+        addIngredient: {
+            title: '',
+            name: '',
+            kcal: 0,
+            id: 0,
+            price: 0,
+            amount: 0,
+        },
         meals:{
             breakfasts: {
             },
         },
+        addMeal: {
+            // counter: [1],
+            // meal2: {
+            //     ing1: "",
+            //     ing1Value: 0,
+            //     ing2: "",
+            //     ing2Value: 0,
+            //     ing3: "",
+            //     ing3Value: 0,
+            // }
+        },
+        ingredientsAddedToMeal: {
+            feta: {id:1, name: "feta", amount: null, kcal: 1, price: 7}
+        },
+        addMealMode: false,
         menus:{
             menu1: {
                 breakfast: "meal1",
@@ -28,6 +55,23 @@ class Layout extends Component{
     }
 
     addIngredientHandler = (type) => {
+        if(this.state.addMealMode === true){
+
+            // const currentMeals = Object.keys(this.state.meals.breakfasts)
+            //     .map((key) => [(key), this.state.meals.breakfasts[key]]);
+
+            const updatedIngredients2 = JSON.parse(JSON.stringify({
+                ...this.state.ingredientsAddedToMeal
+            }));
+
+            const oldCount = this.state.ingredientsAddedToMeal[type].amount;
+            updatedIngredients2[type].amount = oldCount + 1;
+
+            this.setState({ingredientsAddedToMeal: updatedIngredients2})
+            return
+        }
+
+
         const oldCount = this.state.ingredients[type].amount;
         const updatedCount = oldCount + 1;
         const updatedIngredients = {
@@ -93,21 +137,134 @@ class Layout extends Component{
 
     }
 
+    // ----------------------SENDING PRODUCTS TO FIREBASE START------------------------------------------
+    inputIngredientHandler(event, type) {
+        const updatedIngredient = {
+            ...this.state.addIngredient
+        }
+        updatedIngredient[type] = event.target.value
+        this.setState({addIngredient: updatedIngredient})
+    }
+
+    handleIngredientSubmit = () => {
+
+        //form validation
+        if(this.state.addIngredient.title === ''){
+            alert('podaj tytuł produktu')
+            return
+        }
+
+        if(this.state.addIngredient.name === ''){
+            alert('podaj nazwę produktu')
+            return
+        }
+
+        if(this.state.addIngredient.kcal === 0 || this.state.addIngredient.kcal === ''){
+            alert('podaj kaloryczność produktu')
+            return
+        }
+
+        if(this.state.addIngredient.price === 0 || this.state.addIngredient.price === ''){
+            alert('podaj cenę produktu')
+            return
+        }
+
+        //use axios to send ingredient object
+        axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/ingredients/${this.state.addIngredient.title}.json`,
+            {
+                id: this.state.ingredientsID.id + 1,
+                name: this.state.addIngredient.name,
+                amount: this.state.addIngredient.amount,
+                kcal: this.state.addIngredient.kcal,
+                price: this.state.addIngredient.price
+            }
+        )
+            .then(response => console.log(response))
+
+        //use axios to send current id, each new ingredient will receive unique id
+        axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/ingredientsID.json`,
+            {
+                id: this.state.ingredientsID.id + 1
+            }
+        )
+            .then(response => console.log(response))
+
+        //clear state (clear inputs) after sending ingredient
+        this.setState({addIngredient: {
+                title: '',
+                name: '',
+                kcal: 0,
+                id: 0,
+                price: 0,
+                amount: 0,
+            },})
+
+        //make object from array which is copy of the state
+        const updatedIngredients = Object.entries({
+            ...this.state.ingredients
+        })
+
+        //make an array from new ingredient object
+        const newIngredient = [this.state.addIngredient.title, {
+            amount: this.state.addIngredient.amount,
+            id: this.state.ingredientsID.id + 1,
+            kcal: this.state.addIngredient.kcal,
+            name: this.state.addIngredient.name,
+            price: this.state.addIngredient.price}]
+
+        //add new ingredient to ingredients array
+        updatedIngredients.push(newIngredient)
+
+        //make object from ingredients array
+        const newStateObject = Object.fromEntries(updatedIngredients)
+
+        //set new state for ingredients and id
+        this.setState({ingredients: newStateObject})
+        this.setState({ingredientsID: {id: this.state.ingredientsID.id + 1}})
+    }
+
+    // ----------------------SENDING PRODUCTS TO FIREBASE END--------------------------------------------
+
+    //-----------------------ADDING CUSTOM RECIPES START--------------------------------------------------
+    sendCustomRecipeHandler = () => {
+        console.log('wysyłam przepis')
+    }
+
+    switchAddingIngredientsModeHandler = () => {
+        this.setState({addMealMode: true})
+        console.log(this.state.addMealMode)
+    }
+
+    //-----------------------ADDING CUSTOM RECIPES END----------------------------------------------------
+
     componentDidMount() {
 
         //póki co prymitywne pobieranie całej bazy danych z firebase
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredients.json')
             .then(response => {
-                this.setState({ingredients: response.data})
+
+                const ingredients = response.data
+
+                const ingredients2 = JSON.parse(JSON.stringify(ingredients));
+
+
+                // this.setState({ingredients: response.data})
+                this.setState({ingredients: ingredients})
+                this.setState({ingredientsAddedToMeal: ingredients2})
                 }
             )
+        axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredientsID.json')
+            .then(response => {
+                    this.setState({ingredientsID: response.data})
+                }
+            )
+
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/meals.json')
             .then(response => {
                     this.setState({meals: response.data})
                 }
             )
     }
-
 
     render(){
 
@@ -119,6 +276,15 @@ class Layout extends Component{
                         <Products
                             addIngredient={this.addIngredientHandler}
                             ingredientsList = {this.state.ingredients}
+                            inputAddProduct = {this.inputIngredientHandler.bind(this)}
+                            submitProduct = {this.handleIngredientSubmit.bind(this)}
+                            inputValues={this.state.addIngredient}
+                        />
+                    </Route>
+                    <Route path="/przepisy/dodaj">
+                        <RecipesModal
+                            ingredientsList = {this.state.ingredientsAddedToMeal}
+                            addIngredient={this.addIngredientHandler}
                         />
                     </Route>
                     <Route path="/przepisy">
@@ -126,6 +292,9 @@ class Layout extends Component{
                             addMeal = {this.addMealHandler.bind(this)}
                             ingredientsList = {this.state.ingredients}
                             meals={this.state.meals}
+                            productCounter = {this.state.addMeal.counter}
+                            sendCustomRecipe = {this.sendCustomRecipeHandler}
+                            switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
                         />
                     </Route>
                     <Route path="/podsumowanie">
@@ -140,6 +309,7 @@ class Layout extends Component{
                             addWholeDayMeals = {this.addWholeDayMealsHandler.bind(this)}
                         />
                     </Route>
+
 
                 </Switch>
 
