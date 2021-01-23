@@ -3,6 +3,7 @@ import { NavLink } from 'react-router-dom';
 
 import DisplayProducts from '../../products/displayProducts/displayProducts'
 import Shoplist from "../../../containers/Shoplist/Shoplist";
+import Glass from '../../../components/glass/glass'
 
 import styles from './recipesModal.module.scss'
 
@@ -13,6 +14,7 @@ const recipesModal = (props) => {
 
     return(
         // TODO zrobić szkło z jakimś napisem typu 'jesteś w trybie dodawania produktu, wybierz składniki i wyślij'
+        <>
         <div className={styles.RecipesModal}>
             <div>
                 <h1>Dodaj produkty do przepisu</h1>
@@ -30,27 +32,29 @@ const recipesModal = (props) => {
             <div>
 
                 <input
-                    // onChange={(event) => props.inputAddProduct(event, 'name')}
+                    onChange={(event) => props.addMealInputs(event, 'title')}
                     type="text"
                     placeholder="Podaj tytuł produktu"
-                    // value={props.inputValues.name}
+                    value={props.inputValues.breakfasts.title}
                 />
                 <input
-                    // onChange={(event) => props.inputAddProduct(event, 'name')}
+                    onChange={(event) => props.addMealInputs(event, 'name')}
                     type="text"
                     placeholder="Podaj dokładną nazwę produktu"
-                    // value={props.inputValues.name}
+                    value={props.inputValues.breakfasts.name}
                 />
                 <Shoplist
                     allIngredients={allIngredients}
                 />
-                <button type="submit">Wyślij przepis</button>
+                <button onClick={props.sendCustomRecipe} type="submit">Wyślij przepis</button>
 
 
             </div>
-
         </div>
-    )
+    <Glass/>
+        </>
+
+)
 }
 
 export default recipesModal
