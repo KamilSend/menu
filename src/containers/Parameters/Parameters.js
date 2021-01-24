@@ -1,12 +1,54 @@
 import React, { Component } from 'react'
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import axios from '../../axios-meals'
+
+import { signout } from '../../helpers/auth'
 
 import Products from '../../components/products/products'
 import Summary from '../summary/summary'
 import Recipes from "../../components/recipes/recipes";
 import WholeDayMeals from "../WholeDayMealsTemp/WholeDayMeals";
 import RecipesModal from "../../components/recipes/recipesModal/recipesModal"
+import Login from '../../components/authentication/Login'
+import Signup from '../../components/authentication/Signup'
+import { auth } from '../../services/firebase'
+
+function PrivateRoute({ component: Component, authenticated, ...rest }) {
+
+    console.log(authenticated)
+    return (
+        <Route
+            {...rest}
+            render={props =>
+                authenticated === true ? (
+                    <Component {...rest} />
+                ) : (
+                    <Redirect
+                        // to={{ pathname: "/login", state: { from: props.location } }}
+                        to={{ pathname: "/login" }}
+                    />
+                )
+            }
+        />
+    );
+}
+
+function PublicRoute({ component: Component, authenticated, ...rest }) {
+
+    return (
+        <Route
+            {...rest}
+            render={props =>
+                authenticated === false ? (
+                    <Component {...rest} />
+                ) : (
+                    <Redirect to="/login" />
+                )
+            }
+        />
+    );
+}
+
 
 class Layout extends Component{
 
@@ -58,7 +100,8 @@ class Layout extends Component{
                 dinner: "meal1",
                 supper: "meal1",
             }
-        }
+        },
+        authenticated: false,
     }
 
     addIngredientHandler = (type) => {
@@ -348,6 +391,20 @@ class Layout extends Component{
 
     componentDidMount() {
 
+        auth().onAuthStateChanged((user) => {
+            if (user) {
+                this.setState({
+                    authenticated: true,
+                    // loading: false,
+                });
+            } else {
+                this.setState({
+                    authenticated: false,
+                    // loading: false,
+                });
+            }
+        })
+
         //check if add recipe modal is on, and switch mode if neccessary
         if(window.location.pathname === "/przepisy/dodaj"){
             this.setState({addMealMode: true})
@@ -387,19 +444,23 @@ class Layout extends Component{
 
         return(
             <>
-
-                <Switch>
-                    <Route path="/produkty">
-                        <Products
+                    <button onClick={signout}>Wyloguj</button>
+                    <Switch>
+                        {/*<Route exact path="/" component={Products}></Route>*/}
+                        <PrivateRoute
+                            path="/produkty"
+                            authenticated={this.state.authenticated}
+                            component={Products}
                             addIngredient={this.addIngredientHandler}
                             ingredientsList = {this.state.ingredients}
                             inputAddProduct = {this.inputIngredientHandler.bind(this)}
                             submitProduct = {this.handleIngredientSubmit.bind(this)}
                             inputValues={this.state.addIngredient}
                         />
-                    </Route>
-                    <Route path="/przepisy/dodaj">
-                        <RecipesModal
+                        <PrivateRoute
+                            path="/przepisy/dodaj"
+                            authenticated={this.state.authenticated}
+                            component={RecipesModal}
                             ingredientsList = {this.state.ingredientsAddedToMeal}
                             addIngredient={this.addIngredientHandler}
                             switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
@@ -407,33 +468,90 @@ class Layout extends Component{
                             sendCustomRecipe = {this.sendCustomRecipeHandler}
                             inputValues={this.state.addMeal}
                         />
-                    </Route>
-                    <Route path="/przepisy">
-                        <Recipes
+                        <PrivateRoute
+                            path="/przepisy"
+                            authenticated={this.state.authenticated}
+                            component={Recipes}
                             addMeal = {this.addMealHandler.bind(this)}
-                            // addMeal2 = {this.addMealHandler2.bind(this)}
                             ingredientsList = {this.state.ingredients}
-                            // meals={this.state.meals}
                             meals2={this.state.meals2}
                             productCounter = {this.state.addMeal.counter}
                             switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
                         />
-                    </Route>
-                    <Route path="/podsumowanie">
-                        <Summary
+                        <PrivateRoute
+                            path="/podsumowanie"
+                            authenticated={this.state.authenticated}
+                            component={Summary}
                             ingredientsList = {this.state.ingredients}
                         />
-                    </Route>
-                    <Route path="/jadlospisy">
-                        <WholeDayMeals
+                        <PrivateRoute
+                            path="/jadlospisy"
+                            authenticated={this.state.authenticated}
+                            component={WholeDayMeals}
                             ingredientsList = {this.state.ingredients}
                             menus = {this.state.menus}
                             addWholeDayMeals = {this.addWholeDayMealsHandler.bind(this)}
                         />
-                    </Route>
+                            {/*<Route path="/login">*/}
+                            {/*    <Login/>*/}
+                            {/*</Route>*/}
+                        <PublicRoute
+                            path="/signup"
+                            authenticated={this.state.authenticated}
+                            component={Signup}
+                        />
+                        <PublicRoute
+                            path="/login"
+                            authenticated={this.state.authenticated}
+                            component={Login}
+                        />
+                    </Switch>
 
 
-                </Switch>
+                {/*<Switch>*/}
+                {/*    <Route path="/produkty">*/}
+                {/*        <Products*/}
+                {/*            addIngredient={this.addIngredientHandler}*/}
+                {/*            ingredientsList = {this.state.ingredients}*/}
+                {/*            inputAddProduct = {this.inputIngredientHandler.bind(this)}*/}
+                {/*            submitProduct = {this.handleIngredientSubmit.bind(this)}*/}
+                {/*            inputValues={this.state.addIngredient}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*    <Route path="/przepisy/dodaj">*/}
+                {/*        <RecipesModal*/}
+                {/*            ingredientsList = {this.state.ingredientsAddedToMeal}*/}
+                {/*            addIngredient={this.addIngredientHandler}*/}
+                {/*            switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}*/}
+                {/*            addMealInputs={this.addMealInputsHandler.bind(this)}*/}
+                {/*            sendCustomRecipe = {this.sendCustomRecipeHandler}*/}
+                {/*            inputValues={this.state.addMeal}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*    <Route path="/przepisy">*/}
+                {/*        <Recipes*/}
+                {/*            addMeal = {this.addMealHandler.bind(this)}*/}
+                {/*            // addMeal2 = {this.addMealHandler2.bind(this)}*/}
+                {/*            ingredientsList = {this.state.ingredients}*/}
+                {/*            // meals={this.state.meals}*/}
+                {/*            meals2={this.state.meals2}*/}
+                {/*            productCounter = {this.state.addMeal.counter}*/}
+                {/*            switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*    <Route path="/podsumowanie">*/}
+                {/*        <Summary*/}
+                {/*            ingredientsList = {this.state.ingredients}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*    <Route path="/jadlospisy">*/}
+                {/*        <WholeDayMeals*/}
+                {/*            ingredientsList = {this.state.ingredients}*/}
+                {/*            menus = {this.state.menus}*/}
+                {/*            addWholeDayMeals = {this.addWholeDayMealsHandler.bind(this)}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*</Switch>*/}
 
             </>
         )
