@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import { Route, Switch, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import axios from '../../axios-meals'
+import { auth } from '../../services/firebase'
 
 import { signout } from '../../helpers/auth'
 
@@ -11,7 +12,6 @@ import WholeDayMeals from "../WholeDayMealsTemp/WholeDayMeals";
 import RecipesModal from "../../components/recipes/recipesModal/recipesModal"
 import Login from '../../components/authentication/Login'
 import Signup from '../../components/authentication/Signup'
-import { auth } from '../../services/firebase'
 
 function PrivateRoute({ component: Component, authenticated, ...rest }) {
 
@@ -102,6 +102,7 @@ class Layout extends Component{
             }
         },
         authenticated: false,
+        userID: '',
     }
 
     addIngredientHandler = (type) => {
@@ -380,8 +381,6 @@ class Layout extends Component{
 
     }
 
-
-
     switchAddingIngredientsModeHandler = () => {
         this.setState({addMealMode: !this.state.addMealMode})
         console.log(this.state.addMealMode)
@@ -392,9 +391,13 @@ class Layout extends Component{
     componentDidMount() {
 
         auth().onAuthStateChanged((user) => {
+
             if (user) {
+                console.log(user.uid)
+
                 this.setState({
                     authenticated: true,
+                    userID:user.uid,
                     // loading: false,
                 });
             } else {
@@ -403,6 +406,8 @@ class Layout extends Component{
                     // loading: false,
                 });
             }
+
+            console.log(this.state.userID)
         })
 
         //check if add recipe modal is on, and switch mode if neccessary
