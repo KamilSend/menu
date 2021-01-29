@@ -10,7 +10,7 @@ export function signin(email, password) {
 
 export function signout(){
     return auth().signOut().then(() => {
-        console.log('wylogowano')
+        // console.log('wylogowano')
         // Sign-out successful.
     }).catch((error) => {
         console.log(error)
