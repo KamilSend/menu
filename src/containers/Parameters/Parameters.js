@@ -71,7 +71,7 @@ class Layout extends Component{
         meals:{
             breakfasts: {
             },
-            //zmienić całą strukture, żeby było  po prostu jajko: 2, chleb: 2,
+            //możliwe że to meals powyżej, bez 2, jest do usunięcia, możliwe że są jeszcze odwołania w kodzie
         },
         meals2: {
             breakfasts: {
@@ -162,7 +162,7 @@ class Layout extends Component{
         //Make an array of unknown number of function arguments
         const args = Array.prototype.slice.call(arguments)[0];
 
-        console.log('args: '+args)
+        // console.log('args: '+args)
 
         //initialize arrays of ingredients, their values and their current values
         const ingredients = []
