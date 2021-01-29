@@ -11,7 +11,6 @@ const products =(props) => {
     const allIngredients = Object.keys(props.ingredientsList)
         .map((key) => [(key), props.ingredientsList[key]]);
 
-    // console.log(props.ingredientsList)
     // console.log(allIngredients)
 
     return(

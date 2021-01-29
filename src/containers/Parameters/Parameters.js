@@ -1,12 +1,54 @@
 import React, { Component } from 'react'
-import { Route, Switch } from 'react-router-dom';
+import { Route, Switch, BrowserRouter as Router, Redirect } from 'react-router-dom';
 import axios from '../../axios-meals'
+import { auth } from '../../services/firebase'
+
+import { signout } from '../../helpers/auth'
 
 import Products from '../../components/products/products'
 import Summary from '../summary/summary'
 import Recipes from "../../components/recipes/recipes";
 import WholeDayMeals from "../WholeDayMealsTemp/WholeDayMeals";
 import RecipesModal from "../../components/recipes/recipesModal/recipesModal"
+import Login from '../../components/authentication/Login'
+import Signup from '../../components/authentication/Signup'
+
+function PrivateRoute({ component: Component, authenticated, ...rest }) {
+
+    console.log(authenticated)
+    return (
+        <Route
+            {...rest}
+            render={props =>
+                authenticated === true ? (
+                    <Component {...rest} />
+                ) : (
+                    <Redirect
+                        // to={{ pathname: "/login", state: { from: props.location } }}
+                        to={{ pathname: "/login" }}
+                    />
+                )
+            }
+        />
+    );
+}
+
+function PublicRoute({ component: Component, authenticated, ...rest }) {
+
+    return (
+        <Route
+            {...rest}
+            render={props =>
+                authenticated === false ? (
+                    <Component {...rest} />
+                ) : (
+                    <Redirect to="/login" />
+                )
+            }
+        />
+    );
+}
+
 
 class Layout extends Component{
 
@@ -17,6 +59,7 @@ class Layout extends Component{
         ingredientsID:{
             id: 0,
         },
+        allIngredients:{},
         addIngredient: {
             title: '',
             name: '',
@@ -28,7 +71,7 @@ class Layout extends Component{
         meals:{
             breakfasts: {
             },
-            //zmienić całą strukture, żeby było  po prostu jajko: 2, chleb: 2,
+            //możliwe że to meals powyżej, bez 2, jest do usunięcia, możliwe że są jeszcze odwołania w kodzie
         },
         meals2: {
             breakfasts: {
@@ -58,14 +101,13 @@ class Layout extends Component{
                 dinner: "meal1",
                 supper: "meal1",
             }
-        }
+        },
+        authenticated: false,
+        userID: '',
     }
 
     addIngredientHandler = (type) => {
         if(this.state.addMealMode === true){
-            //to będzie potrzebne chyba przy ostatecznym dodawaniu przepisu do właściwego stanu
-            // const currentMeals = Object.keys(this.state.meals.breakfasts)
-            //     .map((key) => [(key), this.state.meals.breakfasts[key]]);
 
             //make copy of current ingredients object (all ingredients available)
             const updatedIngredients2 = JSON.parse(JSON.stringify({
@@ -101,19 +143,14 @@ class Layout extends Component{
                     // console.log(this.state.addMeal)
                 } else return null;
             })
-
-            // TODO: zrobić funkcje do obu inputów (może być jedna z parametrem) która będzie ustawiała name i title,
-            //     później zrobić funkcje do sumbitu która będzie na buttonie, funkcja ta będzie musiała
-            // pobrać id z firebase (zrobić obiekt w state i obiekt w firebase analogicznie jak dla produktów),
-            // ustawić ostateczny stan i wysłać(dodać za pomocą put) do istniejącej bazy i do obecnego stanu przepisów
             return
         }
 
         //simple adding ingredients to state when you are in default mode
-        const oldCount = this.state.ingredients[type].amount;
+        const oldCount = this.state.allIngredients[type].amount;
         const updatedCount = oldCount + 1;
         const updatedIngredients = {
-            ...this.state.ingredients
+            ...this.state.allIngredients
         }
         updatedIngredients[type].amount = updatedCount;
 
@@ -125,7 +162,7 @@ class Layout extends Component{
         //Make an array of unknown number of function arguments
         const args = Array.prototype.slice.call(arguments)[0];
 
-        console.log('args: '+args)
+        // console.log('args: '+args)
 
         //initialize arrays of ingredients, their values and their current values
         const ingredients = []
@@ -134,14 +171,14 @@ class Layout extends Component{
 
         //make copy from current state
         const updatedIngredients = {
-            ...this.state.ingredients
+            ...this.state.allIngredients
         }
 
         //divide function arguments into ingredients and their values, make array of current values
         args.forEach((arg, index) => {
             if (index % 2 === 0 && arg !== null && arg !== undefined){
                 ingredients.push(arg)
-                oldCounts.push(this.state.ingredients[arg].amount)
+                oldCounts.push(this.state.allIngredients[arg].amount)
             }else if(arg !== null && arg !== undefined){
                 values.push(arg)
             }
@@ -209,8 +246,8 @@ class Layout extends Component{
             return
         }
 
-        //use axios to send ingredient object
-        axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/ingredients/${this.state.addIngredient.title}.json`,
+        //use axios to send ingredient object to current user
+        axios.put(`https://menu-b8774-default-rtdb.firebaseio.com/users/${this.state.userID}/ingredients/${this.state.addIngredient.title}.json`,
             {
                 id: this.state.ingredientsID.id + 1,
                 name: this.state.addIngredient.name,
@@ -241,7 +278,7 @@ class Layout extends Component{
 
         //make array which is copy of the state
         const updatedIngredients = Object.entries({
-            ...this.state.ingredients
+            ...this.state.allIngredients
         })
 
         //make an array from new ingredient object
@@ -259,7 +296,7 @@ class Layout extends Component{
         const newStateObject = Object.fromEntries(updatedIngredients)
 
         //set new state for ingredients and id
-        this.setState({ingredients: newStateObject})
+        this.setState({allIngredients: newStateObject})
         this.setState({ingredientsID: {id: this.state.ingredientsID.id + 1}})
     }
 
@@ -337,8 +374,6 @@ class Layout extends Component{
 
     }
 
-
-
     switchAddingIngredientsModeHandler = () => {
         this.setState({addMealMode: !this.state.addMealMode})
         console.log(this.state.addMealMode)
@@ -347,6 +382,42 @@ class Layout extends Component{
     //-----------------------ADDING CUSTOM RECIPES & SENDING TO FIREBASE END----------------------------------------------------
 
     componentDidMount() {
+
+        auth().onAuthStateChanged((user) => {
+            axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredients.json')
+                .then(response => {
+
+                        const ingredients = response.data
+                        this.setState({ingredients: ingredients})
+
+                    }
+                )
+            if (user) {
+                // console.log(user.uid)
+                this.setState({
+                    authenticated: true,
+                    userID:user.uid,
+                    // loading: false,
+                });
+                axios.get(`https://menu-b8774-default-rtdb.firebaseio.com/users/${this.state.userID}/ingredients.json`)
+                    .then(response => {
+                //show allIngredients, this users and those public
+                        if (response.data === null) return
+                        const userIng = Object.entries(response.data)
+                        const currentIng = Object.entries({...this.state.ingredients})
+                        const allIng = currentIng.concat(userIng)
+                        const allIngredients = Object.fromEntries(allIng)
+                        this.setState({allIngredients:allIngredients})
+                        }
+                    )
+            } else {
+                this.setState({
+                    authenticated: false,
+                    // loading: false,
+                });
+            }
+
+        })
 
         //check if add recipe modal is on, and switch mode if neccessary
         if(window.location.pathname === "/przepisy/dodaj"){
@@ -362,6 +433,10 @@ class Layout extends Component{
 
                 this.setState({ingredients: ingredients})
                 this.setState({ingredientsAddedToMeal: ingredients2})
+
+                //-----------------za to sie trzeba wziąć---------------------------------
+                const userIngredients = {...this.state.ingredients}
+                this.setState({allIngredients: userIngredients})
                 }
             )
         axios.get('https://menu-b8774-default-rtdb.firebaseio.com/ingredientsID.json')
@@ -383,23 +458,37 @@ class Layout extends Component{
             )
     }
 
+    testData = () =>{
+        console.log("ingredients:")
+        console.log(this.state.ingredients)
+        console.log("userID:")
+        console.log(this.state.userID)
+        console.log("allIngredients:")
+        console.log(this.state.allIngredients)
+    }
+
     render(){
 
         return(
             <>
-
-                <Switch>
-                    <Route path="/produkty">
-                        <Products
+                    <button onClick={signout}>Wyloguj</button>
+                <button onClick={this.testData}>Wydrukuj dane testowe</button>
+                    <Switch>
+                        {/*<Route exact path="/" component={Products}></Route>*/}
+                        <PrivateRoute
+                            path="/produkty"
+                            authenticated={this.state.authenticated}
+                            component={Products}
                             addIngredient={this.addIngredientHandler}
-                            ingredientsList = {this.state.ingredients}
+                            ingredientsList = {this.state.allIngredients}
                             inputAddProduct = {this.inputIngredientHandler.bind(this)}
                             submitProduct = {this.handleIngredientSubmit.bind(this)}
                             inputValues={this.state.addIngredient}
                         />
-                    </Route>
-                    <Route path="/przepisy/dodaj">
-                        <RecipesModal
+                        <PrivateRoute
+                            path="/przepisy/dodaj"
+                            authenticated={this.state.authenticated}
+                            component={RecipesModal}
                             ingredientsList = {this.state.ingredientsAddedToMeal}
                             addIngredient={this.addIngredientHandler}
                             switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
@@ -407,33 +496,90 @@ class Layout extends Component{
                             sendCustomRecipe = {this.sendCustomRecipeHandler}
                             inputValues={this.state.addMeal}
                         />
-                    </Route>
-                    <Route path="/przepisy">
-                        <Recipes
+                        <PrivateRoute
+                            path="/przepisy"
+                            authenticated={this.state.authenticated}
+                            component={Recipes}
                             addMeal = {this.addMealHandler.bind(this)}
-                            // addMeal2 = {this.addMealHandler2.bind(this)}
-                            ingredientsList = {this.state.ingredients}
-                            // meals={this.state.meals}
+                            ingredientsList = {this.state.allIngredients}
                             meals2={this.state.meals2}
                             productCounter = {this.state.addMeal.counter}
                             switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}
                         />
-                    </Route>
-                    <Route path="/podsumowanie">
-                        <Summary
-                            ingredientsList = {this.state.ingredients}
+                        <PrivateRoute
+                            path="/podsumowanie"
+                            authenticated={this.state.authenticated}
+                            component={Summary}
+                            ingredientsList = {this.state.allIngredients}
                         />
-                    </Route>
-                    <Route path="/jadlospisy">
-                        <WholeDayMeals
-                            ingredientsList = {this.state.ingredients}
+                        <PrivateRoute
+                            path="/jadlospisy"
+                            authenticated={this.state.authenticated}
+                            component={WholeDayMeals}
+                            ingredientsList = {this.state.allIngredients}
                             menus = {this.state.menus}
                             addWholeDayMeals = {this.addWholeDayMealsHandler.bind(this)}
                         />
-                    </Route>
+                            {/*<Route path="/login">*/}
+                            {/*    <Login/>*/}
+                            {/*</Route>*/}
+                        <PublicRoute
+                            path="/signup"
+                            authenticated={this.state.authenticated}
+                            component={Signup}
+                        />
+                        <PublicRoute
+                            path="/login"
+                            authenticated={this.state.authenticated}
+                            component={Login}
+                        />
+                    </Switch>
 
 
-                </Switch>
+                {/*<Switch>*/}
+                {/*    <Route path="/produkty">*/}
+                {/*        <Products*/}
+                {/*            addIngredient={this.addIngredientHandler}*/}
+                {/*            ingredientsList = {this.state.ingredients}*/}
+                {/*            inputAddProduct = {this.inputIngredientHandler.bind(this)}*/}
+                {/*            submitProduct = {this.handleIngredientSubmit.bind(this)}*/}
+                {/*            inputValues={this.state.addIngredient}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*    <Route path="/przepisy/dodaj">*/}
+                {/*        <RecipesModal*/}
+                {/*            ingredientsList = {this.state.ingredientsAddedToMeal}*/}
+                {/*            addIngredient={this.addIngredientHandler}*/}
+                {/*            switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}*/}
+                {/*            addMealInputs={this.addMealInputsHandler.bind(this)}*/}
+                {/*            sendCustomRecipe = {this.sendCustomRecipeHandler}*/}
+                {/*            inputValues={this.state.addMeal}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*    <Route path="/przepisy">*/}
+                {/*        <Recipes*/}
+                {/*            addMeal = {this.addMealHandler.bind(this)}*/}
+                {/*            // addMeal2 = {this.addMealHandler2.bind(this)}*/}
+                {/*            ingredientsList = {this.state.ingredients}*/}
+                {/*            // meals={this.state.meals}*/}
+                {/*            meals2={this.state.meals2}*/}
+                {/*            productCounter = {this.state.addMeal.counter}*/}
+                {/*            switchAddingIngredientsMode = {this.switchAddingIngredientsModeHandler}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*    <Route path="/podsumowanie">*/}
+                {/*        <Summary*/}
+                {/*            ingredientsList = {this.state.ingredients}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*    <Route path="/jadlospisy">*/}
+                {/*        <WholeDayMeals*/}
+                {/*            ingredientsList = {this.state.ingredients}*/}
+                {/*            menus = {this.state.menus}*/}
+                {/*            addWholeDayMeals = {this.addWholeDayMealsHandler.bind(this)}*/}
+                {/*        />*/}
+                {/*    </Route>*/}
+                {/*</Switch>*/}
 
             </>
         )
